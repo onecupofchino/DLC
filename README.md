@@ -67,14 +67,6 @@ multi_step:
 The evaluation results for each shuffle of the training dataset are stored in a unique subdirectory in a newly created directory ‘evaluation-results’ in the project directory.
 The user can visually inspect if the distance between the labeled and the predicted body parts are acceptable.
 
-"Mean average Euclidean error (MAE; which is proportional to the average root mean square error) between the manual labels and the ones predicted by DeepLabCut.
-The MAE is saved as a comma separated file and displayed for all pairs and only likely pairs (>p-cutoff).
-This helps to exclude, for example, occluded body parts.
-Setting plotting to True plots all the testing and training frames with the manual and predicted labels; these will be colored by body part type by default.
-The user should visually check the labeled test (and training) images that are created in the ‘evaluation-results’ directory.
-Ideally, DeepLabCut labeled unseen (test images) according to the user’s required accuracy, and the average train and test errors are comparable (good generalization).
-What (numerically) comprises an acceptable MAE depends on many factors (including the size of the tracked body parts, the labeling variability, etc.).
-Note that the test error can also be larger than the training error due to human variability (in labeling, see Figure 2 in Mathis et al, Nature Neuroscience 2018)."
 
 Los resultados de la evaluación son los siguientes:
 
@@ -105,17 +97,6 @@ Acá lo más importante es ver las imágenes que empiezan con Test (corresponde 
 Manually set labels are displayed as a plus symbol “+” and the model’s predictions either as a dot (for predictions with a high likelyhood) or as an “x” (for predictions with a low likelyhood)
 
 CONCLUSION 2/3: Las imágenes parecen estar bien, aunque del total del test-set sólo seleccionó 4 imágenes en las que los animales estaban cerca, pese a que representaban la mayoría del training-set.
-
-En la carpeta maps hay 3 imágenes de distinto tipo:
-
-1) LOCREF (location refinement): When performing pose estimation, it is important to accurately determine the precise location of body parts or landmarks in an image or video frame. Location refinement refers to the process of improving the initial estimation of the body part locations to make them more accurate. This is usually done by iteratively adjusting the estimated positions based on additional information or using an optimization algorithm to find the best fit.
-2) PAF (part affinity field): a concept used in pose estimation to capture the relationships or connections between different body parts. It provides information about how body parts are related to each other spatially. For example, in a human pose estimation task, the PAF can indicate the likelihood of a specific body part being connected to another body part, such as the elbow being connected to the shoulder. By considering the part affinity field, pose estimation algorithms can better understand the overall pose structure.
-3) SCMAP (score map): a score map refers to an image or representation that assigns a confidence score or probability to each pixel in an image or video frame. This score indicates the likelihood or certainty of a particular body part being present at that pixel location. For example, a score map for the left shoulder would assign higher scores to pixels in the image where the left shoulder is more likely to be present and lower scores to pixels where it is less likely to be present. These score maps are used to identify and localize the body parts within the image or video frame.
-In summary, location refinement improves the accuracy of estimated body part locations, part affinity fields estimate the connections between body parts, and score maps provide confidence scores for the presence of body parts at different locations in an image or video frame.
-
-The architecture is trained to predict the keypoint locations, part affinity fields and animal identity. Three output layers per keypoint predict
-the probability that a joint is in a particular pixel (score map) as well as shifts in relation to the discretized output map (location refinement field).
-Furthermore, part affinity fields predict vector fields encoding the orientation of a connection between two keypoints.
 
 LOCREF: en algunas imágenes del test la nube celeste se ve un poco corrida (ej: img02018.png_locref_test_1_0.95_snapshot-200000), lo que también pasa en algunas del train (ej: C_img01481.png_locref_train_1_0.95_snapshot-200000).
 En líneas generales están bien.
