@@ -8,7 +8,9 @@ In each frame, body parts were labelled as follows: hocico (snout), cabeza (head
 The network was trained using Google Colab for 200.000 iterations.
 
 FILES:
-- CollectedData_Juan.csv#L304: information regarding the labelled data
-- dyadic_dlcrnetms5_KOdyadicJun13shuffle1_200000_el_filtered_id_labeled%20(2).mp4: resulting video (can be viewed raw) 
-- log.txt: the training log in Google Colab
-- CombinedEvaluation-results.xlsx: the evaluation results
+- config.yaml: the configuration file used for training the network. 
+- CollectedData_Juan.csv#L304: information regarding the labelled data.
+- dyadic_dlcrnetms5_KOdyadicJun13shuffle1_200000_el_filtered_id_labeled%20(2).mp4: resulting video (can be viewed raw).
+- log.txt: the training log in Google Colab.
+- CombinedEvaluation-results.xlsx: the evaluation results.
+- glossary: information about some difficult technical terms I encountered in the process. 
