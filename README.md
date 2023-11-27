@@ -7,38 +7,20 @@ My goal was to train the network emphasizing social interaction over global trac
 
 2) In each frame, body parts were labelled as follows: hocico (snout), cabeza (head), cuerposuperior (upper body), cuerpoinferior (lower body), colabase (base of the tail), colapunta (tip of the tail).
 
-3) 
+3) I set identity to "false" in the config file because I want the network to deduce the animal's identities on its own.
 
+4) The CollectedData_Juan.csv and the CollectedData_Juan.h5 were created (a pair for each of the 4 videos). The four .h5 files were used later to create the training set.
+
+5) On the command line, I checked the labels entering deeplabcut.check_labels(config_path, visualizeindividuals=True). This created 4 subfolders ending in _labeled in the labeled-data folder.
+
+6) I uploaded the project folder to Google Drive. Using the COLAB_maDLC template, I created the training dataset with deeplabcut.create_multianimaltraining_dataset(path_config_file, Shuffles=[shuffle], net_type="dlcrnet_ms5",windows2linux=True).
+The training fraction at the config.yaml file was set to 0.95, meaning that 285 out of 300 frames were used for training while the rest was used later for testing.
+The two following folders were created:
+
+- dlc-models > iteration-0. This folder is important because the init_weights parameter can be changed to resume training if it was interrupted (it should point to the route of the snapshot corresponding to the last iteration). E.g.: init_weights: /content/drive/My Drive/your project/dlc-models/iteration-n/NOMBRE/train/snapshot-30000 (the extension following the snapshot number should be deleted).
+- training-datasets > iteration-0: UnaugmentedDataSet_KOdyadicJun13. I use the CollectedData_Juan.csv to confirm that the training data set was created using the labels from the 4 videos. Also, I checked that the .h5 and the .pickle files were created.
 
  
- 
- Seteo a identity como "false" en el archivo config, ya que no voy a mantener la identidad de los animales entre frames y eso lo va a deducir la red entrenada.
-
-En Napari se debe seleccionar la opción "save selected layers" y no la "save all layers" (cuelga el programa y no lo guarda).
-Se crean 2 archivos: CollectedData_Juan.csv y CollectedData_Juan.h5 (este último será usado en el entrenamiento de la red).
-Repito el labeling para los 4 videos, obteniendo 4 archivos .csv y 4 .h5. 
-
-Consulta: al momento de crear el training set, toma la info de esos 4 .h5? Respuesta: SÍ (ver 16/6)
-
-16/6/23:
-
-- chequeo las labels ingresando: deeplabcut.check_labels(config_path, visualizeindividuals=True) en el CMD. Eso crea 4 subcarpetas con terminación _labeled en la carpeta labeled-data. Parecen estar ok y se crearon para los 4 videos labeleados.
-
-- para crear el training set cargo la carpeta del proyecto a Google drive en mi cuenta ueharajm.dlc@gmail.com. Creo un Collab llamado "KOdyadic-Juan-2023-06-13". Descargo el config.yaml y le cambio el project_path a /content/drive/MyDrive/KOdyadic-Juan-2023-06-13. Lo resubo al drive.
-
-- Ya en el Collab, cambio la ruta de acceso a path_config_file = '/content/drive/MyDrive/KOdyadic-Juan-2023-06-13/config.yaml'.
-Más abajo, le doy a deeplabcut.create_multianimaltraining_dataset(path_config_file, Shuffles=[shuffle], net_type="dlcrnet_ms5",windows2linux=True).
-
-windows2linux=True se pone porque los frames ya se labelearon previamente.
-
-Eso crea el training dataset con los siguientes parámetros:  Shuffle: 1 TrainFraction:  0.95 (285 en total). Editar la variable shuffle en caso de querer re-entrenar la red. Se crean las siguientes carpetas:
-
-1) en dlc-models: iteration-0. Esta carpeta es importante porque en la subcarpeta TRAIN y en el archivo pose_cfg.yaml se puede cambiar el parámetro init_weights (inicialmente seteado a resnet) para retomar el entrenamiento. Se debe descargar el archivo pose_cfg.yaml y modificar el parámetro "init_weights" para que apunte a la ruta del snapshot de la última iteración en vez de a la red preentrenada.
-Ej: init_weights: /content/drive/My Drive/your project/dlc-models/iteration-n/NOMBRE/train/snapshot-30000. ELIMINAR LA EXTENSIÓN QUE SIGE AL NÚMERO DE SNAPSHOT.
-Para que tome ese snapshot, el archivo debe ser reemplazado en Colab DESPUES de haber creado el training dataset porque si se sube antes y luego se crea el training dataset, el archivo pose es reemplazado por resnet nuevamente.
-
-2) en training-datasets: iteration-0: UnaugmentedDataSet_KOdyadicJun13. En el archivo CollectedData_Juan.csv se comprueba que el data set fue creado con los labels de los 4 archivos. También se crearon los archivos .h5 y .pickle.
-
 - En Collab voy a START TRAINING y cambio:
 deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=100,saveiters=1000, maxiters=75000, allow_growth=True).
 por: deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=1000,saveiters=5000, maxiters=100000, allow_growth=True). No excederse de 100000 en maxiters porque dicen que "overfitea" y afecta la performance. Pongo saveiters=5000 por si el Collab se desconecta, cuestión de no perder 10000 iteraciones. Empiezo a entrenar.
