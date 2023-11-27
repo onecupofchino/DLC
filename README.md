@@ -1,17 +1,18 @@
-# DLC
+# Multianimal DLC
 Tracking dyadic social interaction between mice with multi-animal DLC
 
-13/6/23:
+1) I manually selected 300 frames obtained from 4 videos recorded at 2 different sociability chambers.
+In 70% of the frames, the dyad was interacting closely. In 30% of the frames, both animals were far from each other.
+My goal was to train the network emphasizing social interaction over global tracking.
 
-- instalo DLC, creo el proyecto, cropeo 4 videos con la GUI y extraigo frames automáticamente con el algoritmo kmeans (2 chamber A, 2 chamber B)
+2) In each frame, body parts were labelled as follows: hocico (snout), cabeza (head), cuerposuperior (upper body), cuerpoinferior (lower body), colabase (base of the tail), colapunta (tip of the tail).
 
-14/6/23:
+3) 
 
-- del total de frames selecciono manualmente 300, de los cuales 200 tienen a la díada cerca o interactuando (nombres de archivos inician con C_ de close) y 100 no. De cada video queda así: OBS1: 38C, 25 otros; OBS2: 67C, 25 otros; OBS3: 34C, 25 otros; OBS4: 61C, 25 otros.
-La idea es entrenar la red haciendo hincapié en las conductas target de interacción social y no tanto en el trackeo global del animal,
-que fue lo que se hizo en anteriores oportunidades y no salió muy bien (ej: confundía la ID de los animales).
 
-- hago el labeling de las partes del cuerpo en cada frame. Defino las bodyparts como: hocico, cabeza, cuerposuperior, cuerpoinferior, colabase y colapunta. Seteo a identity como "false" en el archivo config, ya que no voy a mantener la identidad de los animales entre frames y eso lo va a deducir la red entrenada.
+ 
+ 
+ Seteo a identity como "false" en el archivo config, ya que no voy a mantener la identidad de los animales entre frames y eso lo va a deducir la red entrenada.
 
 En Napari se debe seleccionar la opción "save selected layers" y no la "save all layers" (cuelga el programa y no lo guarda).
 Se crean 2 archivos: CollectedData_Juan.csv y CollectedData_Juan.h5 (este último será usado en el entrenamiento de la red).
