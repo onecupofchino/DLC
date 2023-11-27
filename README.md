@@ -14,22 +14,16 @@ My goal was to train the network emphasizing social interaction over global trac
 5) On the command line, I checked the labels entering deeplabcut.check_labels(config_path, visualizeindividuals=True). This created 4 subfolders ending in _labeled in the labeled-data folder.
 
 6) I uploaded the project folder to Google Drive. Using the COLAB_maDLC template, I created the training dataset with deeplabcut.create_multianimaltraining_dataset(path_config_file, Shuffles=[shuffle], net_type="dlcrnet_ms5",windows2linux=True).
-The training fraction at the config.yaml file was set to 0.95, meaning that 285 out of 300 frames were used for training while the rest was used later for testing.
+The training fraction at the config.yaml file was set to 0.95, meaning that 285 out of 300 frames were used for training while the rest were used later for testing.
 The two following folders were created:
 
 - dlc-models > iteration-0. This folder is important because the init_weights parameter can be changed to resume training if it was interrupted (it should point to the route of the snapshot corresponding to the last iteration). E.g.: init_weights: /content/drive/My Drive/your project/dlc-models/iteration-n/NOMBRE/train/snapshot-30000 (the extension following the snapshot number should be deleted).
 - training-datasets > iteration-0: UnaugmentedDataSet_KOdyadicJun13. I use the CollectedData_Juan.csv to confirm that the training data set was created using the labels from the 4 videos. Also, I checked that the .h5 and the .pickle files were created.
 
- 
-- En Collab voy a START TRAINING y cambio:
-deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=100,saveiters=1000, maxiters=75000, allow_growth=True).
-por: deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=1000,saveiters=5000, maxiters=100000, allow_growth=True). No excederse de 100000 en maxiters porque dicen que "overfitea" y afecta la performance. Pongo saveiters=5000 por si el Collab se desconecta, cuestión de no perder 10000 iteraciones. Empiezo a entrenar.
+7) In Start Training, I change deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=100,saveiters=1000, maxiters=75000, allow_growth=True) for
+deeplabcut.train_network(path_config_file, shuffle=shuffle, displayiters=1000,saveiters=5000, maxiters=100000, allow_growth=True). I set maxiters to 100000 to prevent overfitting. I set saveiters to 5000 to prevent iterations from being lost in case Colab was disconnected. I started training.
 
-20/6/23:
-
-- Reemplazo en el pose_cfg.yaml el parámetro init_weights por SNAPSHOT-85000  sin extensión.
-- Reemplazo el archivo en el drive y le doy a entrenar nuevamente.
-- Retoma desde el snapshot indicado pero continúa más allá de las 100000 iteraciones indicadas en el Colab como maxiters. Ésto sucede porque también hay que cambiar el valor en el archivo pose_cfg.yaml, en la última línea del parámetro multistep:
+8) I resumed training from snapshot 85000. Unexpectedly, training continued beyond 100000 iterations, despite maxiters was set to that value. Someone at the DLC forums suggested that I should also change the last line of the multistep parameter in the pose_cfg.yaml file. 
 
 multi_step:
 - - 0.0001
@@ -37,21 +31,11 @@ multi_step:
 - - 5.0e-05
   - 12000
 - - 1.0e-05
-  - 200000  <<<<<<<<<<<<<<  Lo cambio a 150000.
+  - 200000  <<<<<<<<<<<<<<  I set it to 150000.
 
-- No se soluciona el problema de maxiters, sigue iterando. Dejo corriendo hasta 200000, supuestamente para automáticamente.
-- El problema persiste. Me pongo en contacto por el foro de DLC.
+This solution didn't work and training didn't stop at 150000 iterations. I chose to continue training up to 200000 despite overfitting because it was supposed to stop automatically. It didn't. I chose to manually stop the training and proceed.
 
-21/6/23:
-
-- Pese a que detuve el entrenamiento manualmente, voy a START EVALUATING para chequear si me deja proceder. Me deja seguir.
-- Se crea la carpeta evaluation-results para la iteración 0. Para analizar estos datos, me remito al manual de multianimal:
-
-The evaluation results for each shuffle of the training dataset are stored in a unique subdirectory in a newly created directory ‘evaluation-results’ in the project directory.
-The user can visually inspect if the distance between the labeled and the predicted body parts are acceptable.
-
-
-Los resultados de la evaluación son los siguientes:
+9) I clicked Start Evaluating. The folder evaluation-results was created for iteration 0. The evaluation results were as follows:
 
 Training iterations: %Training dataset Shuffle number Train error(px) Test error(px) p-cutoff used Train error with p-cutoff Test error with p-cutoff
 200000 95 1 02.07 2.28 0.6 02.07 2.28
@@ -70,23 +54,11 @@ cuerpoinferior    2.677194
 cuerposuperior    2.139069
 hocico            2.492535
 
-*** the average error per bodypart is the average of all the data (both test and train) with p-cutoff applied (i.e. not considering low-confidence predictions). ***
+With the folder LabeledImages_DLC_dlcrnetms5_KOdyadicJun13shuffle1_200000_snapshot-200000, I visually inspected if the distance between the labeled and the predicted body parts was acceptable. Here, I focused on the images starting with test (corresponding to the 5% of the training set that DLC used to estimate the position).
+The DLC manual states that "...manually set labels are displayed as a plus symbol “+” and the model’s predictions either as a dot (for predictions with a high likelyhood) or as an “x” (for predictions with a low likelyhood)..."
 
-CONCLUSION 1/3: el train y test error son similares y parecen bajos.
+Based on the difference between the train and test errors, and the visual inspection of the images, I concluded that the training seemed to be OK. 
 
-La evaluación basada en imágenes la hago con la carpeta LabeledImages_DLC_dlcrnetms5_KOdyadicJun13shuffle1_200000_snapshot-200000.
-Acá lo más importante es ver las imágenes que empiezan con Test (corresponde al 5% del training set donde la red intentó estimar la posición)
-Ésto es importante para leer la imagen:
-Manually set labels are displayed as a plus symbol “+” and the model’s predictions either as a dot (for predictions with a high likelyhood) or as an “x” (for predictions with a low likelyhood)
-
-CONCLUSION 2/3: Las imágenes parecen estar bien, aunque del total del test-set sólo seleccionó 4 imágenes en las que los animales estaban cerca, pese a que representaban la mayoría del training-set.
-
-LOCREF: en algunas imágenes del test la nube celeste se ve un poco corrida (ej: img02018.png_locref_test_1_0.95_snapshot-200000), lo que también pasa en algunas del train (ej: C_img01481.png_locref_train_1_0.95_snapshot-200000).
-En líneas generales están bien.
-PAF: las imágenes del test parecen estar bastante bien, discriminando la ID de los 2 animales, lo que también sucede en las del train.
-SCMAP: son las mismas imágenes de LOCREF sin las flechas rojas.
-
-CONCLUSION 3/3: el entrenamiento de la red parece estar bastante bien.
 
 PUNTO DE DECISIÓN:
 
